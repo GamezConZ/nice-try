@@ -25,7 +25,7 @@ class User:
         return 'User'
 
 class Question:
-    # Define a question with its type, and in case of multiple options receives a list of options
+    # Define a question with its type. If TF options is a boolean if MCh then is a list.
     def __init__(self, question, type_of_question, true_or_false = False, options = []):
         self.question = question
         self.type_of_question = type_of_question
@@ -34,7 +34,7 @@ class Question:
     def __repr__(self):
         return 'Question'
     
-    # .ask() prints the question
+    # .ask() prints each question
     def ask(self):
         print('\n')
         print('Question: ')
@@ -83,10 +83,9 @@ class Question:
 
 def create_user():
     print('###################################')
-    print('###################################')
     print('Welcome!')
-    print('Let\'s set you up into the program')
-    username = input('Please provide your username: ')
+    print('Let\'s start the program')
+    username = input('Please provide your username: \n')
     creator = False
     role = input('Do you want to create questions(Q) or start answering(A)? (Q/A):').upper()
     if role == 'Q':
@@ -96,18 +95,21 @@ def create_user():
 def create_questions():
     questions = []
     while True:
-        print('###################################')
-        print('###################################')
         print('\n')
-        question_type = input('Do you want to create a multiple choice(M) or True/False(T) question? (M/T): ').upper()
+        question_type = input('To create a Multiple Choice question enter M:\nTo create a True or False question enter T:\n').upper()
 
         if question_type == 'T':
             question_sentence = input('Enter the question: ')
-            question_answer = input('Is it true(T) or false(F)? (T/F): ').upper()
-            if question_answer == 'T':
-                true_or_false = True
-            elif question_answer == 'F':
-                true_or_false = False
+            while True:
+                question_answer = input('If the right answer is True enter T:\nIf the right answer is False enter F:\n').upper()
+                if question_answer == 'T':
+                    true_or_false = True
+                    break
+                elif question_answer == 'F':
+                    true_or_false = False
+                    break
+                else:
+                    print('Invalid input, try again!')
 
             questions.append(Question(question_sentence, 'True or False', True, true_or_false))
             print(f'Question created! There are {len(questions)} questions now!')
@@ -115,11 +117,11 @@ def create_questions():
         elif question_type == 'M':
             local_answers = []
             question_sentence = input('Enter the question: ')
-            number_of_answers = int(input('Enter the number of options for this question: (2,3,4): '))
+            number_of_answers = int(input('Enter the number of options for this question (2,3,4): '))
             right_answer = input('Enter the correct answer: ')
             local_answers.append([right_answer, True])
             for i in range(number_of_answers - 1):
-                local_answers.append([input('Enter another option: '), False])
+                local_answers.append([input('Enter an incorrect option: '), False])
 
             questions.append(Question(question_sentence, 'Multiple Choice', False, local_answers))
             print(f'Question created! There are {len(questions)} questions now!')
@@ -127,7 +129,6 @@ def create_questions():
         else:
             print('Invalid option!')
 
-        print('###################################')
         print('###################################')
         print('\n')
 
@@ -139,16 +140,14 @@ def create_questions():
     print('\n')
     print('Question creation process completed!')
     print('###################################')
-    print('###################################')
 
     return(questions)
 
 # save_questions() creates a dictionary, adds the creator as first key:value
 # then loops through the questions and save the info into a json file 
 # the json file uses the username as name
-def save_questions(questions_list, filename, user):
+def save_questions(questions_list, user):
     questions_dict = {}
-    questions_dict['username'] = user.username
     for i in range(len(questions_list)):
         questions_dict[i] = {
             'question': questions_list[i].question, 
@@ -156,23 +155,30 @@ def save_questions(questions_list, filename, user):
             'true_or_false': questions_list[i].true_or_false, 
             'options': questions_list[i].options
         }
-    with open(f'{user.username}.json', 'w') as q_json:
+    with open(f'{user.username.lower()}.json', 'w') as q_json:
         json.dump(questions_dict, q_json)
+    print(f'Questions succesfully saved in {user.username}.json file.\nUse \'{user.username.lower()}\' to load them')
+
+def use_saved_questions():
+    username = input('Please enter the username of the questions you want to answer: ').lower()
+    with open(f'{username}.json', 'r') as q_json:
+        questions_dict = json.load(q_json)
+    questions_list = []
+    for q in questions_dict.values():
+        questions_list.append(Question(q['question'],q['type_of_question'],q['true_or_false'],q['options']))
+    return questions_list
 
 def main():
     current_user = create_user()
     if current_user.creator:
         questions = create_questions()
-        save_questions(questions, 'prueba', current_user)
+        save_questions(questions, current_user)
     else:
-        pass
-
-
-
-    """ 
-    for question in questions:
-        question.ask()
-        question.answers(current_user)
-    """
+        questions = use_saved_questions()
+        for question in questions:
+            question.ask()
+            question.answers(current_user)
+        print(f'Those were all the questions.\nYou ended up with {current_user.correct_answers} correct answers and {current_user.wrong_answers} wrong answers!')
+        print('Good Bye!')
 
 main()
