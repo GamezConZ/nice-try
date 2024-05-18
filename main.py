@@ -1,20 +1,11 @@
 # This a simple portofolio project to showcase python skills under the Codecademy lessons
-# It's going to be a game questionaire for friends, with a minimum of two players
+# It's going to be a questionaire for friends, with a minimum of two players
 # One or more friends write a personal questions quiz and the others have to guess the answer
-# (Based on losing the apartment scene on Friends)
-# IDEAS List:
-# Running the program to specify if the user is going to create or answer the questions.
-# Input the questions creator's data and funcionality (multiple choice - boolean)
-# Create the questions based on what the user specified
-# Save the questions to a json file
-# Running the program as an answerer
-# Input the answerer's data and functionality
-# loading the json file
-# Asking the question
-# Returning the results
+
 import random
 import json
 
+# The user class defines the player data
 class User:
     def __init__(self, username, creator = False):
         self.username = username
@@ -24,8 +15,8 @@ class User:
     def __repr__(self):
         return 'User'
 
+# Question defines a question with its type. If TF options is a boolean if MCh then is a list.
 class Question:
-    # Define a question with its type. If TF options is a boolean if MCh then is a list.
     def __init__(self, question, type_of_question, true_or_false = False, options = []):
         self.question = question
         self.type_of_question = type_of_question
@@ -40,7 +31,7 @@ class Question:
         print('Question: ')
         print(self.question)
     
-    # .answer() checks if the provided answer is correct or not
+    # .answers() renders the answers and checks if the user input is correct or not
     # It prints the result and adds the record to the user
     def answers(self, user):
         if self.true_or_false:
@@ -60,6 +51,7 @@ class Question:
                 user.wrong_answers += 1
         else:
             # randomly prints the options
+            # correct_num keeps track of the num value that's associated with a True option.
             num = 0
             correct_num = 0
             num_string = ''
@@ -72,6 +64,7 @@ class Question:
                     correct_num = num
                 num_string += f'{num} - '
             choice = int(input(f'Choose between options {num_string}: '))
+
             if choice == correct_num:
                 print('Correct!')
                 print('\n')
@@ -81,6 +74,7 @@ class Question:
                 print('\n')
                 user.wrong_answers += 1
 
+# create_user() ask for the information to create an user object
 def create_user():
     print('###################################')
     print('Welcome!')
@@ -92,6 +86,7 @@ def create_user():
         creator = True
     return User(username, creator)
 
+# create_questions() is a series of input steps to organize the question and return them as a list.
 def create_questions():
     questions = []
     while True:
@@ -143,9 +138,8 @@ def create_questions():
 
     return(questions)
 
-# save_questions() creates a dictionary, adds the creator as first key:value
-# then loops through the questions and save the info into a json file 
-# the json file uses the username as name
+# save_questions() creates a dictionary, loops through the questions and save the info into a json file 
+# the json file uses user.username as file name
 def save_questions(questions_list, user):
     questions_dict = {}
     for i in range(len(questions_list)):
@@ -159,6 +153,8 @@ def save_questions(questions_list, user):
         json.dump(questions_dict, q_json)
     print(f'Questions succesfully saved in {user.username}.json file.\nUse \'{user.username.lower()}\' to load them')
 
+# use_saved_questions() tries to load a json file with the specified input string as a name
+# then it creates a list of Question objects with the info.
 def use_saved_questions():
     username = input('Please enter the username of the questions you want to answer: ').lower()
     with open(f'{username}.json', 'r') as q_json:
@@ -168,6 +164,7 @@ def use_saved_questions():
         questions_list.append(Question(q['question'],q['type_of_question'],q['true_or_false'],q['options']))
     return questions_list
 
+# main() runs the previous functions in order
 def main():
     current_user = create_user()
     if current_user.creator:
