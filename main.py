@@ -13,6 +13,7 @@
 # Asking the question
 # Returning the results
 import random
+import json
 
 class User:
     def __init__(self, username, creator = False):
@@ -45,10 +46,15 @@ class Question:
         if self.true_or_false:
             choice = input('Is it True or False?: (T/F): ').upper()
             if choice == 'T':
+                choice = True
+            elif choice == 'F':
+                choice = False
+
+            if choice == self.options:
                 print('Correct!')
                 print('\n')
                 user.correct_answers += 1
-            else:
+            elif choice == self.options:
                 print('Incorrect!')
                 print('\n')
                 user.wrong_answers += 1
@@ -130,20 +136,43 @@ def create_questions():
             continue
         if another == 'N':
             break
-
+    print('\n')
     print('Question creation process completed!')
     print('###################################')
     print('###################################')
 
     return(questions)
 
+# save_questions() creates a dictionary, adds the creator as first key:value
+# then loops through the questions and save the info into a json file 
+# the json file uses the username as name
+def save_questions(questions_list, filename, user):
+    questions_dict = {}
+    questions_dict['username'] = user.username
+    for i in range(len(questions_list)):
+        questions_dict[i] = {
+            'question': questions_list[i].question, 
+            'type_of_question': questions_list[i].type_of_question, 
+            'true_or_false': questions_list[i].true_or_false, 
+            'options': questions_list[i].options
+        }
+    with open(f'{user.username}.json', 'w') as q_json:
+        json.dump(questions_dict, q_json)
+
 def main():
     current_user = create_user()
     if current_user.creator:
         questions = create_questions()
+        save_questions(questions, 'prueba', current_user)
+    else:
+        pass
+
+
+
+    """ 
     for question in questions:
         question.ask()
         question.answers(current_user)
-
+    """
 
 main()
