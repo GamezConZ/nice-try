@@ -23,18 +23,18 @@ bash
 
     python3 main.py
 
-Creating a Quiz
+### Creating a Quiz
 
   Run the program and select the option to create questions.
   Follow the prompts to input your questions and save them.
 
-Taking a Quiz
+### Taking a Quiz
 
    Run the program and select the option to answer questions.
    Provide the username of the quiz creator to load the saved questions.
    Answer the questions as prompted.
 
-Code Overview
+### Code Overview
 
    User class: Stores user data and tracks quiz performance.
    
@@ -51,7 +51,7 @@ Code Overview
    main(): Main function to run the program.
    
 
-Contributing
+### Contributing
 
 Contributions are welcome! Please feel free to open an issue or submit a pull request.
 
